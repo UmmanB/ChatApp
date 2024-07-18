@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="9dm-iw-scG">
     <device id="retina6_72" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22685"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -19,13 +20,94 @@
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>
+                    <navigationItem key="navigationItem" id="eS4-i1-fZb"/>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="139" y="-2"/>
+            <point key="canvasLocation" x="138" y="657"/>
+        </scene>
+        <!--Custom Tab Bar Controller-->
+        <scene sceneID="iIF-0l-qWu">
+            <objects>
+                <tabBarController id="9dm-iw-scG" customClass="CustomTabBarController" customModule="ChatApp" customModuleProvider="target" sceneMemberID="viewController">
+                    <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" itemPositioning="centered" itemSpacing="0.0" itemWidth="8" id="h03-bm-obm" customClass="CustomTabBar" customModule="ChatApp" customModuleProvider="target">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="49"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <color key="tintColor" name="customPurple"/>
+                        <color key="selectedImageTintColor" name="customPurple"/>
+                    </tabBar>
+                    <connections>
+                        <segue destination="Poe-IR-nEd" kind="relationship" relationship="viewControllers" id="fN7-dD-NEQ"/>
+                        <segue destination="bfC-L0-UTH" kind="relationship" relationship="viewControllers" id="WaV-UF-dYZ"/>
+                    </connections>
+                </tabBarController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="su4-1e-4LL" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="494" y="-721"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="75j-sb-8Ej">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="Poe-IR-nEd" sceneMemberID="viewController">
+                    <tabBarItem key="tabBarItem" title="" image="Message" id="XAx-L6-s9G">
+                        <color key="badgeColor" name="customPurple"/>
+                    </tabBarItem>
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="XEh-OW-DyI">
+                        <rect key="frame" x="0.0" y="59" width="430" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="BYZ-38-t0r" kind="relationship" relationship="rootViewController" id="1Gj-ja-Jzg"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="T4W-B4-9lk" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="138.13953488372093" y="-2.5751072961373391"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="7nK-W4-nPd">
+            <objects>
+                <navigationController id="bfC-L0-UTH" sceneMemberID="viewController">
+                    <tabBarItem key="tabBarItem" title="" image="User" id="bgj-Rp-kCV">
+                        <color key="badgeColor" name="customPurple"/>
+                    </tabBarItem>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="Ksl-qP-sjW">
+                        <rect key="frame" x="0.0" y="59" width="430" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="ca6-ti-iGA" kind="relationship" relationship="rootViewController" id="JVh-oY-dUl"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="mto-YK-yXi" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="871" y="-3"/>
+        </scene>
+        <!--Profile View Controller-->
+        <scene sceneID="bAy-vG-bta">
+            <objects>
+                <viewController id="ca6-ti-iGA" customClass="ProfileViewController" customModule="ChatApp" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="dMR-ev-ST4">
+                        <rect key="frame" x="0.0" y="0.0" width="430" height="932"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <viewLayoutGuide key="safeArea" id="FYH-WX-Dej"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="qfC-zR-AmF"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="bs6-1q-XfG" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="871" y="657"/>
         </scene>
     </scenes>
     <resources>
+        <image name="Message" width="26" height="26"/>
+        <image name="User" width="26" height="26"/>
+        <namedColor name="customPurple">
+            <color red="0.23921568627450981" green="0.29019607843137257" blue="0.47843137254901963" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

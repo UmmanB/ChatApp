@@ -1,169 +1,168 @@
 import UIKit
 import FirebaseAuth
+import JGProgressHUD
 
-class RegisterViewController: UIViewController
+final class RegisterViewController: UIViewController
 {
-    private let titleLabel: UILabel =
+    private let spinner = JGProgressHUD(style: .dark)
+   
+    private lazy var titleLabel: UILabel = 
     {
         let label = UILabel()
         label.text = "Sign up with Email"
         label.textAlignment = .center
-        label.font = .systemFont(ofSize: 18, weight: .bold)
+        label.font = UIFont(name: "Poppins-Bold", size: 18)
         label.textColor = .customPurple
         label.numberOfLines = 1
         label.adjustsFontSizeToFitWidth = true
-        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
-    private let subtitleLabel: UILabel =
+    private lazy var subtitleLabel: UILabel = 
     {
         let label = UILabel()
         label.text = "Get chatting with friends and family today by signing up for our chat app!"
         label.textAlignment = .center
-        label.font = .systemFont(ofSize: 14, weight: .light)
+        label.font = UIFont(name: "Poppins-Light", size: 14)
         label.textColor = .customGray
         label.numberOfLines = 2
         label.adjustsFontSizeToFitWidth = true
-        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
-    private let imageView: UIImageView = 
+    private lazy var imageView: UIImageView = 
     {
         let imageView = UIImageView()
-        imageView.image = UIImage(systemName: "person")
+        imageView.image = UIImage(systemName: "person.circle.fill")
         imageView.tintColor = .gray
         imageView.contentMode = .scaleAspectFit
         imageView.layer.masksToBounds = true
+        imageView.layer.cornerRadius = imageView.frame.size.width / 2.0
         imageView.layer.borderWidth = 2
         imageView.layer.borderColor = UIColor.customPurple.cgColor
-        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.isUserInteractionEnabled = true
+        imageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(didTapProfilePic)))
         return imageView
     }()
-
-    private let nameLabel: UILabel =
+    
+    private lazy var nameLabel: UILabel = 
     {
         let label = UILabel()
         label.text = "Your name"
-    
-        label.font = .systemFont(ofSize: 14, weight: .medium)
+        label.font = UIFont(name: "Poppins-Medium", size: 14)
         label.textColor = .customPurple
-  
-        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
-    private let nameField: UITextField =
+    private lazy var nameField: UITextField = 
     {
         let field = UITextField()
         field.autocapitalizationType = .none
         field.autocorrectionType = .no
         field.returnKeyType = .continue
         field.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 5, height: 0))
+        field.font = UIFont(name: "Poppins-Medium", size: 14)
         field.leftViewMode = .always
-        field.translatesAutoresizingMaskIntoConstraints = false
         return field
     }()
     
-    private let nameLineView: UIView =
+    private lazy var nameLineView: UIView = 
     {
         let view = UIView()
         view.backgroundColor = .customLightGray
-        view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
-    
-    private let emailLabel: UILabel =
+    private lazy var emailLabel: UILabel = 
     {
         let label = UILabel()
         label.text = "Your email"
-    
-        label.font = .systemFont(ofSize: 14, weight: .medium)
+        label.font = UIFont(name: "Poppins-Medium", size: 14)
         label.textColor = .customPurple
-  
-        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
-    private let emailField: UITextField =
+    private lazy var emailField: UITextField = 
     {
         let field = UITextField()
         field.autocapitalizationType = .none
         field.autocorrectionType = .no
         field.returnKeyType = .continue
-
         field.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 5, height: 0))
+        field.font = UIFont(name: "Poppins-Medium", size: 14)
         field.leftViewMode = .always
-        field.translatesAutoresizingMaskIntoConstraints = false
         return field
     }()
     
-    private let emailLineView: UIView =
+    private lazy var emailLineView: UIView = 
     {
         let view = UIView()
         view.backgroundColor = .customLightGray
-        view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
-    private let passwordLabel: UILabel =
+    private lazy var passwordLabel: UILabel = 
     {
         let label = UILabel()
         label.text = "Password"
-        label.font = .systemFont(ofSize: 14, weight: .medium)
+        label.font = UIFont(name: "Poppins-Medium", size: 14)
         label.textColor = .customPurple
-        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
-    private let passwordField: UITextField =
+    private lazy var passwordField: UITextField = 
     {
         let field = UITextField()
         field.autocapitalizationType = .none
         field.autocorrectionType = .no
         field.returnKeyType = .done
         field.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 5, height: 0))
+        field.font = UIFont(name: "Poppins-Medium", size: 14)
         field.leftViewMode = .always
         field.isSecureTextEntry = true
-        field.translatesAutoresizingMaskIntoConstraints = false
         return field
     }()
     
-    private let passwordLineView: UIView = 
+    private lazy var passwordLineView: UIView = 
     {
         let view = UIView()
         view.backgroundColor = .customLightGray
-        view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
-    private let registerButton: UIButton = 
+    private lazy var registerButton: UIButton = 
     {
         let button = UIButton()
         let backgroundImage = UIImage(named: "Rectangle 1159")
         button.setBackgroundImage(backgroundImage, for: .normal)
         button.setTitle("Create an account", for: .normal)
         button.setTitleColor(.white, for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: 16, weight: .bold)
+        button.titleLabel?.font = UIFont(name: "Poppins-Bold", size: 16)
+        button.layer.cornerRadius = 25
         button.layer.masksToBounds = true
-        button.translatesAutoresizingMaskIntoConstraints = false
         return button
+    }()
+    
+    private lazy var backButtonLabel: UILabel =
+    {
+        let label = UILabel()
+        label.text = "Already have an account? Log In"
+        label.textColor = .customGray
+        label.textAlignment = .center
+        label.font = UIFont(name: "Poppins-Regular", size: 14)
+        label.isUserInteractionEnabled = true
+        label.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(backButtonTapped)))
+        return label
     }()
 
     override func viewDidLoad()
     {
         super.viewDidLoad()
-        title = "Create an account"
         view.backgroundColor = .white
-//        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Register", style: .done, target: self, action: #selector(didTapRegister))
-        
+        navigationItem.hidesBackButton = true
         registerButton.addTarget(self, action: #selector(registerButtonTapped), for: .touchUpInside)
-         
         emailField.delegate = self
         passwordField.delegate = self
-        
         view.addSubview(titleLabel)
         view.addSubview(subtitleLabel)
         view.addSubview(imageView)
@@ -177,19 +176,18 @@ class RegisterViewController: UIViewController
         view.addSubview(passwordField)
         view.addSubview(passwordLineView)
         view.addSubview(registerButton)
-        
+        view.addSubview(backButtonLabel)
         setupConstraints()
-        
         imageView.isUserInteractionEnabled = true
-        
         let gesture = UITapGestureRecognizer(target: self, action: #selector(didTapProfilePic))
-        
         gesture.numberOfTouchesRequired = 1
         gesture.numberOfTapsRequired = 1
         imageView.addGestureRecognizer(gesture)
     }
     
-    override func viewDidLayoutSubviews() 
+    @objc private func backButtonTapped() { navigationController?.popViewController(animated: true) }
+    
+    override func viewDidLayoutSubviews()
     {
         super.viewDidLayoutSubviews()
         imageView.layer.cornerRadius = imageView.frame.size.width / 2.0
@@ -202,137 +200,227 @@ class RegisterViewController: UIViewController
     
     private func setupConstraints()
     {
-        NSLayoutConstraint.activate([
-            view.topAnchor.constraint(equalTo: view.topAnchor),
-            view.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            view.trailingAnchor.constraint(equalTo: view.trailingAnchor)
-        ])
+        titleLabel.snp.makeConstraints { make in
+            make.top.equalToSuperview().offset(100)
+            make.centerX.equalToSuperview()
+            make.width.equalToSuperview().multipliedBy(0.6)
+            make.height.equalTo(40)
+        }
         
-        NSLayoutConstraint.activate([
-            titleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 100),
-            titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            titleLabel.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.6),
-            titleLabel.heightAnchor.constraint(equalToConstant: 40)
-        ])
+        subtitleLabel.snp.makeConstraints { make in
+            make.top.equalTo(titleLabel.snp.bottom).offset(10)
+            make.centerX.equalToSuperview()
+            make.width.equalTo(view).multipliedBy(0.6)
+            make.height.equalTo(40)
+        }
         
-        NSLayoutConstraint.activate([
-            subtitleLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 10),
-            subtitleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            subtitleLabel.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.6),
-            subtitleLabel.heightAnchor.constraint(equalToConstant: 40)
-        ])
+        imageView.snp.makeConstraints { make in
+            make.top.equalTo(subtitleLabel.snp.bottom).offset(40)
+            make.centerX.equalToSuperview()
+            make.width.equalTo(view).multipliedBy(0.2)
+            make.height.equalTo(imageView.snp.width)
+        }
         
-        NSLayoutConstraint.activate([
-            imageView.topAnchor.constraint(equalTo: subtitleLabel.bottomAnchor, constant: 50),
-            imageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            imageView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.3),
-            imageView.heightAnchor.constraint(equalTo: imageView.widthAnchor)
-            ])
+        nameLabel.snp.makeConstraints { make in
+            make.top.equalTo(imageView.snp.bottom).offset(40)
+            make.leading.equalTo(view).offset(24)
+            make.trailing.equalTo(view).offset(-24)
+            make.height.equalTo(20)
+        }
         
-        NSLayoutConstraint.activate([
-            nameLabel.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 50),
-            nameLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
-            nameLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
-            nameLabel.heightAnchor.constraint(equalToConstant: 40)
-        ])
+        nameField.snp.makeConstraints { make in
+            make.top.equalTo(nameLabel.snp.bottom).offset(10)
+            make.leading.trailing.equalTo(nameLabel)
+            make.height.equalTo(30)
+        }
         
-        NSLayoutConstraint.activate([
-            nameField.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 20),
-            nameField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
-            nameField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
-            nameField.heightAnchor.constraint(equalToConstant: 40)
-        ])
+        nameLineView.snp.makeConstraints { make in
+            make.top.equalTo(nameField.snp.bottom).offset(0)
+            make.leading.trailing.equalTo(nameField)
+            make.height.equalTo(1)
+        }
         
-        NSLayoutConstraint.activate([
-            nameLineView.topAnchor.constraint(equalTo: nameField.bottomAnchor, constant: 0),
-            nameLineView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
-            nameLineView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
-            nameLineView.heightAnchor.constraint(equalToConstant: 1)
-        ])
+        emailLabel.snp.makeConstraints { make in
+            make.top.equalTo(nameLineView.snp.bottom).offset(20)
+            make.leading.trailing.equalTo(nameLabel)
+            make.height.equalTo(20)
+        }
         
-        NSLayoutConstraint.activate([
-            emailLabel.topAnchor.constraint(equalTo: nameLineView.bottomAnchor, constant: 20),
-            emailLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
-            emailLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
-            emailLabel.heightAnchor.constraint(equalToConstant: 40)
-        ])
+        emailField.snp.makeConstraints { make in
+            make.top.equalTo(emailLabel.snp.bottom).offset(10)
+            make.leading.trailing.equalTo(nameLabel)
+            make.height.equalTo(30)
+        }
         
-        NSLayoutConstraint.activate([
-            emailField.topAnchor.constraint(equalTo: emailLabel.bottomAnchor, constant: 20),
-            emailField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
-            emailField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
-            emailField.heightAnchor.constraint(equalToConstant: 30)
-        ])
+        emailLineView.snp.makeConstraints { make in
+            make.top.equalTo(emailField.snp.bottom).offset(0)
+            make.leading.trailing.equalTo(nameField)
+            make.height.equalTo(1)
+        }
         
-        NSLayoutConstraint.activate([
-            emailLineView.topAnchor.constraint(equalTo: emailField.bottomAnchor, constant: 0),
-            emailLineView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
-            emailLineView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
-            emailLineView.heightAnchor.constraint(equalToConstant: 1)
-        ])
+        passwordLabel.snp.makeConstraints { make in
+            make.top.equalTo(emailLineView.snp.bottom).offset(20)
+            make.leading.trailing.equalTo(nameLabel)
+            make.height.equalTo(20)
+        }
         
-        NSLayoutConstraint.activate([
-            passwordLabel.topAnchor.constraint(equalTo: emailLineView.bottomAnchor, constant: 20),
-            passwordLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
-            passwordLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
-            passwordLabel.heightAnchor.constraint(equalToConstant: 40)
-        ])
+        passwordField.snp.makeConstraints { make in
+            make.top.equalTo(passwordLabel.snp.bottom).offset(10)
+            make.leading.trailing.equalTo(nameLabel)
+            make.height.equalTo(30)
+        }
         
-        NSLayoutConstraint.activate([
-            passwordField.topAnchor.constraint(equalTo: passwordLabel.bottomAnchor, constant: 20),
-            passwordField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
-            passwordField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
-            passwordField.heightAnchor.constraint(equalToConstant: 30)
-        ])
+        passwordLineView.snp.makeConstraints { make in
+            make.top.equalTo(passwordField.snp.bottom).offset(0)
+            make.leading.trailing.equalTo(nameField)
+            make.height.equalTo(1)
+        }
         
-        NSLayoutConstraint.activate([
-            passwordLineView.topAnchor.constraint(equalTo: passwordField.bottomAnchor, constant: 0),
-            passwordLineView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
-            passwordLineView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
-            passwordLineView.heightAnchor.constraint(equalToConstant: 1)
-        ])
+        registerButton.snp.makeConstraints { make in
+            make.top.equalTo(passwordLineView.snp.bottom).offset(40)
+            make.leading.trailing.equalTo(nameLabel)
+            make.height.equalTo(50)
+        }
         
-        NSLayoutConstraint.activate([
-            registerButton.topAnchor.constraint(equalTo: passwordLineView.bottomAnchor, constant: 50),
-            registerButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
-            registerButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
-            registerButton.heightAnchor.constraint(equalToConstant: 52)
-        ])
+        backButtonLabel.snp.makeConstraints { make in
+            make.top.equalTo(registerButton.snp.bottom).offset(10)
+            make.leading.trailing.equalTo(nameLabel)
+            make.height.equalTo(50)
+        }
+    }
+    
+    override func viewWillAppear(_ animated: Bool)
+    {
+        super.viewWillAppear(animated)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+
+    override func viewWillDisappear(_ animated: Bool) 
+    {
+        super.viewWillDisappear(animated)
+        NotificationCenter.default.removeObserver(self)
+    }
+
+    @objc private func keyboardWillShow(notification: Notification) 
+    {
+        guard let userInfo = notification.userInfo, let keyboardFrame = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
+        let safeAreaBottomInset = view.safeAreaInsets.bottom
+        let keyboardHeight = keyboardFrame.height - safeAreaBottomInset
+        let textFieldBottomY = backButtonLabel.frame.maxY + 20
+        let offset = textFieldBottomY - (view.frame.height - keyboardHeight)
+        
+        if offset > 0
+        {
+            UIView.animate(withDuration: 0.3)
+            {
+                self.view.frame.origin.y = -offset
+                self.view.layoutIfNeeded()
+            }
+        }
+    }
+    
+    @objc private func keyboardWillHide()
+    {
+        UIView.animate(withDuration: 0.1)
+        {
+            self.view.frame.origin.y = 0
+            self.view.layoutIfNeeded()
+        }
     }
     
     @objc private func registerButtonTapped()
     {
-        print("registerButtonTapped")
         emailField.resignFirstResponder()
         passwordField.resignFirstResponder()
         nameField.resignFirstResponder()
-        
-        guard let name = nameField.text, let email = emailField.text, let password = passwordField.text, !name.isEmpty, !email.isEmpty, !password.isEmpty, password.count >= 6
-        
-        else
+            
+        guard let name = nameField.text, let email = emailField.text, let password = passwordField.text else
         {
             alertUserLoginError()
-            return 
+            return
         }
-                
-        FirebaseAuth.Auth.auth().createUser(withEmail: email, password: password) { authResult, error in
-            guard let result = authResult, error == nil else
+        
+        if name.isEmpty || email.isEmpty || password.isEmpty 
+        {
+            alertUserLoginError(message: "Please enter all information to create an account.")
+            return
+        }
+        
+        if password.count < 6
+        {
+            alertUserLoginError(message: "Password must be at least 6 characters long.")
+            return
+        }
+        
+        if imageView.image == UIImage(systemName: "person.circle.fill")
+        {
+            alertUserLoginError(message: "Please select a profile picture.")
+            return
+        }
+        
+        spinner.show(in: view)
+        
+        // Firebase Log In
+        DatabaseManager.shared.userExists(with: email, completion: { [weak self] exists in
+            
+            guard let strongSelf = self else { return }
+            DispatchQueue.main.async { strongSelf.spinner.dismiss() }
+           
+            guard !exists else
             {
-                print("Error creating else")
+                // user already exists
+                strongSelf.alertUserLoginError(message: "A user account for that email address already exists.")
                 return
             }
             
-            let user = result.user
-            print("Created User: \(user)")
-           
-        }
+            FirebaseAuth.Auth.auth().createUser(withEmail: email, password: password) { authResult, error in
+                
+                guard authResult != nil, error == nil else
+                {
+                    print("Error creating user")
+                    return
+                }
+                
+                UserDefaults.standard.setValue(email, forKey: "email")
+                UserDefaults.standard.setValue(name, forKey: "name")
+                
+                let chatUser = ChatAppUser(name: name, emailAddress: email)
+                
+                DatabaseManager.shared.insertUser(with: chatUser) { success in
+                    if success
+                    {
+                        guard let image = strongSelf.imageView.image, let data = image.pngData()
+                        else { return }
+        
+                        let filename = chatUser.profilePictureFileName
+                        
+                        guard let selectedImage = UIImage(data: data) else 
+                        {
+                            print("Failed to convert data to UIImage")
+                            return
+                        }
+
+                        StorageManager.shared.uploadProfilePicture(with: selectedImage, fileName: filename) { result in
+                            switch result
+                            {
+                            case.success(let downloadUrl):
+                                UserDefaults.standard.set(downloadUrl, forKey: "profile_picture_url")
+                                print(downloadUrl)
+                            case.failure(let error):
+                                print("Storage manager error: \(error)")
+                            }
+                        }
+                    }
+                }
+                strongSelf.navigationController?.dismiss(animated: true, completion: nil)
+            }
+        })
     }
     
-    func alertUserLoginError()
+    func alertUserLoginError(message: String = "Please enter all information to create an account.")
     {
-        let alert = UIAlertController(title: "Oops", message: "Please enter all information to create an account.", preferredStyle: .alert)
-        
+        let alert = UIAlertController(title: "Oops", message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: nil))
         present(alert, animated: true)
     }
@@ -349,16 +437,8 @@ extension RegisterViewController: UITextFieldDelegate
 {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool
     {
-        if textField == emailField
-        {
-            passwordField.becomeFirstResponder()
-        }
-        
-        else if textField == passwordField
-        {
-            registerButtonTapped()
-        }
-        
+        if textField == emailField { passwordField.becomeFirstResponder() }
+        else if textField == passwordField { registerButtonTapped() }
         return true
     }
 }
@@ -371,7 +451,6 @@ extension RegisterViewController: UIImagePickerControllerDelegate, UINavigationC
         actionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         actionSheet.addAction(UIAlertAction(title: "Take Photo", style: .default, handler: { [weak self] _ in self?.presentCamera()}))
         actionSheet.addAction(UIAlertAction(title: "Choose Photo", style: .default, handler: { [weak self] _ in self?.presentPhotoPicker()}))
-        
         present(actionSheet, animated: true)
     }
     
@@ -395,21 +474,23 @@ extension RegisterViewController: UIImagePickerControllerDelegate, UINavigationC
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any])
     {
-        guard let selectedImage = info[UIImagePickerController.InfoKey.editedImage] as? UIImage
-        
-        else
-        {
-            return
+        picker.dismiss(animated: true, completion: nil)
+        guard let selectedImage = info[.editedImage] as? UIImage else { return }
+        self.imageView.image = selectedImage
+                
+        // Upload the image data to Firebase Storage
+        let filename = "profile_picture.png"
+        StorageManager.shared.uploadProfilePicture(with: selectedImage, fileName: filename) { result in
+            switch result
+            {
+            case .success(let downloadUrl):
+                UserDefaults.standard.set(downloadUrl, forKey: "profile_picture_url")
+                print("Uploaded profile picture URL: \(downloadUrl)")
+            case .failure(let error):
+                print("Storage manager error: \(error)")
+            }
         }
-        
-         self.imageView.image = selectedImage
-        
-        picker.dismiss(animated: true, completion: nil)
-        print(info)
-    }
-    
-    func imagePickerControllerDidCancel(_ picker: UIImagePickerController)
-    {
-        picker.dismiss(animated: true, completion: nil)
     }
 }
+
+

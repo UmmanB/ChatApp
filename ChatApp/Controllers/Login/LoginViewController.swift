@@ -1,75 +1,109 @@
 import UIKit
+import SnapKit
 import FirebaseAuth
+import FacebookLogin
+import JGProgressHUD
 
-class LoginViewController: UIViewController
+final class LoginViewController: UIViewController
 {
-    private let titleLabel: UILabel = 
+    private let spinner = JGProgressHUD(style: .dark)
+    
+    private lazy var titleLabel: UILabel =
     {
         let label = UILabel()
-        label.text = "Log in to Chatbox"
+        label.text = "Log in"
         label.textAlignment = .center
-        label.font = .systemFont(ofSize: 18, weight: .bold)
+        label.font = UIFont(name: "Poppins-Bold", size: 18)
         label.textColor = .customPurple
         label.numberOfLines = 1
         label.adjustsFontSizeToFitWidth = true
-        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
-    private let subtitleLabel: UILabel = 
+    private lazy var subtitleLabel: UILabel =
     {
         let label = UILabel()
-        label.text = "Welcome back! Sign in using your email to continue"
+        label.text = "Welcome back! Sign in using your Facebook account or email to continue"
         label.textAlignment = .center
-        label.font = .systemFont(ofSize: 14, weight: .light)
-        label.textColor = .customGray
+        label.font = UIFont(name: "Poppins-Light", size: 14)
+        label.textColor = .gray
         label.numberOfLines = 2
         label.adjustsFontSizeToFitWidth = true
-        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
-    private let emailLabel: UILabel = 
+    private lazy var facebookCustomButton: UIButton =
+    {
+        let button = UIButton(type: .system)
+        button.setImage(UIImage(named: "FacebookPNG"), for: .normal)
+        button.layer.cornerRadius = 30
+        button.clipsToBounds = true
+        button.addTarget(self, action: #selector(loginWithFacebook), for: .touchUpInside)
+        return button
+    }()
+    
+    private lazy var lineViewLeft: UIView =
+    {
+        let view = UIView()
+        view.backgroundColor = .lightGray
+        return view
+    }()
+    
+    private lazy var orLabel: UILabel =
+    {
+        let label = UILabel()
+        label.text = "or"
+        label.font = UIFont(name: "Poppins-Regular", size: 14)
+        label.textColor = .gray
+        label.textAlignment = .center
+        return label
+    }()
+    
+    private lazy var lineViewRight: UIView =
+    {
+        let view = UIView()
+        view.backgroundColor = .lightGray
+        return view
+    }()
+    
+    private lazy var emailLabel: UILabel =
     {
         let label = UILabel()
         label.text = "Your email"
-        label.font = .systemFont(ofSize: 14, weight: .medium)
+        label.font = UIFont(name: "Poppins-Medium", size: 14)
         label.textColor = .customPurple
-        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
-    private let emailField: UITextField = 
+    private lazy var emailField: UITextField =
     {
         let field = UITextField()
         field.autocapitalizationType = .none
         field.autocorrectionType = .no
         field.returnKeyType = .continue
         field.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 5, height: 0))
+        field.font = UIFont(name: "Poppins-Medium", size: 14)
         field.leftViewMode = .always
-        field.translatesAutoresizingMaskIntoConstraints = false
         return field
     }()
     
-    private let emailLineView: UIView =
+    private lazy var emailLineView: UIView =
     {
         let view = UIView()
-        view.backgroundColor = .customLightGray
-        view.translatesAutoresizingMaskIntoConstraints = false
+        view.backgroundColor = .lightGray
         return view
     }()
     
-    private let passwordLabel: UILabel = 
+    private lazy var passwordLabel: UILabel =
     {
         let label = UILabel()
         label.text = "Password"
-        label.font = .systemFont(ofSize: 14, weight: .medium)
+        label.font = UIFont(name: "Poppins-Medium", size: 14)
         label.textColor = .customPurple
-        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
-    private let passwordField: UITextField = 
+    private lazy var passwordField: UITextField =
     {
         let field = UITextField()
         field.autocapitalizationType = .none
@@ -77,46 +111,61 @@ class LoginViewController: UIViewController
         field.returnKeyType = .done
         field.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 5, height: 0))
         field.leftViewMode = .always
+        field.font = UIFont(name: "Poppins-Medium", size: 14)
         field.isSecureTextEntry = true
-        field.translatesAutoresizingMaskIntoConstraints = false
         return field
     }()
     
-    private let passwordLineView: UIView = 
+    private lazy var passwordLineView: UIView =
     {
         let view = UIView()
-        view.backgroundColor = .customLightGray
-        view.translatesAutoresizingMaskIntoConstraints = false
+        view.backgroundColor = .lightGray
         return view
     }()
     
-    private let loginButton: UIButton = 
+    private lazy var loginButton: UIButton =
     {
         let button = UIButton()
         let backgroundImage = UIImage(named: "Rectangle 1159")
         button.setBackgroundImage(backgroundImage, for: .normal)
-        button.setTitle("Log In", for: .normal)
+        button.setTitle("Log in", for: .normal)
         button.setTitleColor(.white, for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: 16, weight: .bold)
+        button.titleLabel?.font = UIFont(name: "Poppins-Bold", size: 18)
+        button.layer.cornerRadius = 25
         button.layer.masksToBounds = true
-        button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
 
-    override func viewDidLoad() 
+    private lazy var registerLabel: UILabel = 
+    {
+        let label = UILabel()
+        label.text = "Don't have an account? Create a new one"
+        label.textColor = .customGray
+        label.textAlignment = .center
+        label.font = UIFont(name: "Poppins-Regular", size: 14)
+        label.isUserInteractionEnabled = true
+        label.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(didTapRegister)))
+        return label
+    }()
+
+    override func viewDidLoad()
     {
         super.viewDidLoad()
-        title = "Log In"
         view.backgroundColor = .white
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Register", style: .done, target: self, action: #selector(didTapRegister))
-        
         loginButton.addTarget(self, action: #selector(loginButtonTapped), for: .touchUpInside)
-        
         emailField.delegate = self
         passwordField.delegate = self
-        
+        setupConstraints()
+    }
+    
+    private func setupConstraints()
+    {
         view.addSubview(titleLabel)
         view.addSubview(subtitleLabel)
+        view.addSubview(facebookCustomButton)
+        view.addSubview(lineViewLeft)
+        view.addSubview(orLabel)
+        view.addSubview(lineViewRight)
         view.addSubview(emailLabel)
         view.addSubview(emailField)
         view.addSubview(emailLineView)
@@ -124,81 +173,144 @@ class LoginViewController: UIViewController
         view.addSubview(passwordField)
         view.addSubview(passwordLineView)
         view.addSubview(loginButton)
+        view.addSubview(registerLabel)
         
-        setupConstraints()
+        titleLabel.snp.makeConstraints { make in
+            make.top.equalToSuperview().offset(100)
+            make.centerX.equalToSuperview()
+            make.width.equalToSuperview().multipliedBy(0.6)
+            make.height.equalTo(40)
+        }
+            
+        subtitleLabel.snp.makeConstraints { make in
+            make.top.equalTo(titleLabel.snp.bottom).offset(10)
+            make.centerX.equalToSuperview()
+            make.width.equalToSuperview().multipliedBy(0.6)
+            make.height.equalTo(40)
+        }
+        
+        facebookCustomButton.snp.makeConstraints { make in
+            make.top.equalTo(subtitleLabel.snp.bottom).offset(30)
+            make.centerX.equalToSuperview()
+            make.width.equalTo(50)
+            make.height.equalTo(50)
+        }
+        
+        lineViewLeft.snp.makeConstraints { make in
+            make.centerY.equalTo(orLabel)
+            make.leading.equalToSuperview().offset(24)
+            make.trailing.equalTo(orLabel.snp.leading).offset(-10)
+            make.height.equalTo(1)
+        }
+        
+        orLabel.snp.makeConstraints { make in
+            make.top.equalTo(facebookCustomButton.snp.bottom).offset(30)
+            make.centerX.equalToSuperview()
+            make.width.equalToSuperview().multipliedBy(0.2)
+            make.height.equalTo(20)
+        }
+        
+        lineViewRight.snp.makeConstraints { make in
+            make.centerY.equalTo(orLabel)
+            make.trailing.equalToSuperview().offset(-24)
+            make.leading.equalTo(orLabel.snp.trailing).offset(10)
+            make.height.equalTo(1)
+        }
+        
+        emailLabel.snp.makeConstraints { make in
+            make.top.equalTo(lineViewLeft.snp.bottom).offset(20)
+            make.leading.equalToSuperview().offset(24)
+            make.trailing.equalToSuperview().offset(-24)
+            make.height.equalTo(20)
+        }
+        
+        emailField.snp.makeConstraints { make in
+            make.top.equalTo(emailLabel.snp.bottom).offset(10)
+            make.leading.equalToSuperview().offset(24)
+            make.trailing.equalToSuperview().offset(-24)
+            make.height.equalTo(30)
+        }
+        
+        emailLineView.snp.makeConstraints { make in
+            make.top.equalTo(emailField.snp.bottom).offset(0)
+            make.leading.equalToSuperview().offset(24)
+            make.trailing.equalToSuperview().offset(-24)
+            make.height.equalTo(1)
+        }
+        
+        passwordLabel.snp.makeConstraints { make in
+            make.top.equalTo(emailLineView.snp.bottom).offset(20)
+            make.leading.equalToSuperview().offset(24)
+            make.trailing.equalToSuperview().offset(-24)
+            make.height.equalTo(20)
+        }
+        
+        passwordField.snp.makeConstraints { make in
+            make.top.equalTo(passwordLabel.snp.bottom).offset(10)
+            make.leading.equalToSuperview().offset(24)
+            make.trailing.equalToSuperview().offset(-24)
+            make.height.equalTo(30)
+        }
+        
+        passwordLineView.snp.makeConstraints { make in
+            make.top.equalTo(passwordField.snp.bottom).offset(0)
+            make.leading.equalToSuperview().offset(24)
+            make.trailing.equalToSuperview().offset(-24)
+            make.height.equalTo(1)
+        }
+        
+        loginButton.snp.makeConstraints { make in
+            make.top.equalTo(passwordLineView.snp.bottom).offset(40)
+            make.leading.equalToSuperview().offset(24)
+            make.trailing.equalToSuperview().offset(-24)
+            make.height.equalTo(50)
+        }
+        
+        registerLabel.snp.makeConstraints { make in
+            make.top.equalTo(loginButton.snp.bottom).offset(10)
+            make.leading.trailing.equalTo(loginButton)
+            make.height.equalTo(50)
+        }
     }
-    
-    private func setupConstraints() 
+
+    override func viewWillAppear(_ animated: Bool) 
     {
-        NSLayoutConstraint.activate([
-            view.topAnchor.constraint(equalTo: view.topAnchor),
-            view.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            view.trailingAnchor.constraint(equalTo: view.trailingAnchor)
-        ])
+        super.viewWillAppear(animated)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+
+    override func viewWillDisappear(_ animated: Bool) 
+    {
+        super.viewWillDisappear(animated)
+        NotificationCenter.default.removeObserver(self)
+    }
+
+    @objc private func keyboardWillShow(notification: Notification)
+    {
+        guard let userInfo = notification.userInfo, let keyboardFrame = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
+        let safeAreaBottomInset = view.safeAreaInsets.bottom
+        let keyboardHeight = keyboardFrame.height - safeAreaBottomInset
+        let textFieldBottomY = registerLabel.frame.maxY + 20
+        let offset = textFieldBottomY - (view.frame.height - keyboardHeight)
         
-        NSLayoutConstraint.activate([
-            titleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 200),
-            titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            titleLabel.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.6),
-            titleLabel.heightAnchor.constraint(equalToConstant: 40)
-        ])
-        
-        NSLayoutConstraint.activate([
-            subtitleLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 10),
-            subtitleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            subtitleLabel.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.6),
-            subtitleLabel.heightAnchor.constraint(equalToConstant: 40)
-        ])
-        
-        NSLayoutConstraint.activate([
-            emailLabel.topAnchor.constraint(equalTo: subtitleLabel.bottomAnchor, constant: 150),
-            emailLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
-            emailLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
-            emailLabel.heightAnchor.constraint(equalToConstant: 40)
-        ])
-        
-        NSLayoutConstraint.activate([
-            emailField.topAnchor.constraint(equalTo: emailLabel.bottomAnchor, constant: 20),
-            emailField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
-            emailField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
-            emailField.heightAnchor.constraint(equalToConstant: 30)
-        ])
-        
-        NSLayoutConstraint.activate([
-            emailLineView.topAnchor.constraint(equalTo: emailField.bottomAnchor, constant: 0),
-            emailLineView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
-            emailLineView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
-            emailLineView.heightAnchor.constraint(equalToConstant: 1)
-        ])
-        
-        NSLayoutConstraint.activate([
-            passwordLabel.topAnchor.constraint(equalTo: emailLineView.bottomAnchor, constant: 20),
-            passwordLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
-            passwordLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
-            passwordLabel.heightAnchor.constraint(equalToConstant: 40)
-        ])
-        
-        NSLayoutConstraint.activate([
-            passwordField.topAnchor.constraint(equalTo: passwordLabel.bottomAnchor, constant: 20),
-            passwordField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
-            passwordField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
-            passwordField.heightAnchor.constraint(equalToConstant: 30)
-        ])
-        
-        NSLayoutConstraint.activate([
-            passwordLineView.topAnchor.constraint(equalTo: passwordField.bottomAnchor, constant: 0),
-            passwordLineView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
-            passwordLineView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
-            passwordLineView.heightAnchor.constraint(equalToConstant: 1)
-        ])
-        
-        NSLayoutConstraint.activate([
-            loginButton.topAnchor.constraint(equalTo: passwordLineView.bottomAnchor, constant: 152),
-            loginButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
-            loginButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
-            loginButton.heightAnchor.constraint(equalToConstant: 52)
-        ])
+        if offset > 0
+        {
+            UIView.animate(withDuration: 0.3)
+            {
+                self.view.frame.origin.y = -offset
+                self.view.layoutIfNeeded()
+            }
+        }
+    }
+
+    @objc private func keyboardWillHide()
+    {
+        UIView.animate(withDuration: 0.1)
+        {
+            self.view.frame.origin.y = 0
+            self.view.layoutIfNeeded()
+        }
     }
     
     @objc private func loginButtonTapped()
@@ -206,59 +318,197 @@ class LoginViewController: UIViewController
         emailField.resignFirstResponder()
         passwordField.resignFirstResponder()
         
-        guard let email = emailField.text, let password = passwordField.text, !email.isEmpty, !password.isEmpty, password.count >= 6
-       
-        else
+        guard let email = emailField.text, let password = passwordField.text, !email.isEmpty, !password.isEmpty else
         {
-            alertUserLoginError()
+            alertUserLoginError("Please enter all information to log in.")
             return
         }
         
-        FirebaseAuth.Auth.auth().signIn(withEmail: email, password: password) { authResult, error in
+        guard password.count >= 6 else
+        {
+            alertUserLoginError("Password must be at least 6 characters long.")
+            return
+        }
+        
+        spinner.show(in: view)
+        
+        // Firebase Log In
+        
+        FirebaseAuth.Auth.auth().signIn(withEmail: email, password: password) { [weak self] authResult, error in
+            guard let strongSelf = self else { return }
+        
+            DispatchQueue.main.async { strongSelf.spinner.dismiss() }
+            
+            if let error = error {
+                        print("Failed to log in user with email: \(email), error: \(error.localizedDescription)")
+                        strongSelf.presentLoginErrorAlert()
+                        return
+                    }
             
             guard let result = authResult, error == nil else
             {
                 print("Failed to log in user with email: \(email)")
+                strongSelf.presentLoginErrorAlert()
                 return
             }
             
             let user = result.user
+            
+            let safeEmail = DatabaseManager.safeEmail(emailAddress: email)
+            DatabaseManager.shared.getDataFor(path: safeEmail) { result in
+                switch result
+                {
+                case .success(let data):
+                    guard let userData = data as? [String: Any],
+                          let userName = userData["name"] as? String else { return }
+                  
+                    DispatchQueue.main.async
+                    {
+                        UserDefaults.standard.set(userName, forKey: "name")
+                        UserDefaults.standard.set(email, forKey: "email")
+                        strongSelf.navigationController?.dismiss(animated: true, completion: nil)
+                    }
+                    
+                case .failure(let error): print("Failed to read data with error \(error)")
+                }
+            }
             print("Logged In User: \(user)")
+            
         }
     }
     
-    func alertUserLoginError()
-    {
-        let alert = UIAlertController(title: "Oops", message: "Please enter all information to log in.", preferredStyle: .alert)
-        
+    private func presentLoginErrorAlert() {
+        let alert = UIAlertController(title: "Login Error", message: "Failed to log in. Please check your email and password and try again.", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: nil))
+        present(alert, animated: true, completion: nil)
+    }
+
+    private func alertUserLoginError(_ message: String) {
+        let alert = UIAlertController(title: "Oops", message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: nil))
         present(alert, animated: true)
     }
     
-    @objc private func didTapRegister() 
+    @objc private func didTapRegister()
     {
         print("didTapRegister")
         let vc = RegisterViewController()
-        vc.title = "Create Account"
         navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    @objc private func loginWithFacebook() 
+    {
+        let loginManager = LoginManager()
+        loginManager.logIn(permissions: ["public_profile", "email"], from: self) { [weak self] (result, error) in
+            guard let strongSelf = self else { return }
+
+            if let error = error 
+            {
+                print("Facebook login failed with error: \(error.localizedDescription)")
+                return
+            }
+            
+            guard let result = result, !result.isCancelled else 
+            {
+                print("Facebook login was cancelled")
+                return
+            }
+            
+            // Successfully logged in with Facebook
+            let accessToken = result.token?.tokenString
+            
+            let facebookRequest = GraphRequest(graphPath: "me", parameters: ["fields": "email, name, picture.type(large)"], tokenString: accessToken, version: nil, httpMethod: .get)
+            
+            facebookRequest.start { _, result, error in
+                guard let result = result as? [String: Any], error == nil else 
+                {
+                    print("Failed to make Facebook graph request")
+                    return
+                }
+                
+                print(result)
+                
+                guard let userName = result["name"] as? String,
+                      let email = result["email"] as? String,
+                      let picture = result["picture"] as? [String: Any],
+                      let data = picture["data"] as? [String: Any],
+                      let pictureUrl = data["url"] as? String else {
+                    print("Failed to get email and name from Facebook result")
+                    return
+                }
+                
+                UserDefaults.standard.set(email, forKey: "email")
+                UserDefaults.standard.set(userName, forKey: "name")
+                
+                DatabaseManager.shared.userExists(with: email) { exists in
+                    if !exists
+                    {
+                        let chatUser = ChatAppUser(name: userName, emailAddress: email)
+                        DatabaseManager.shared.insertUser(with: chatUser) { success in
+                            if success
+                            {
+                                guard let url = URL(string: pictureUrl) else
+                                {
+                                    print("Failed to get URL from Facebook picture data")
+                                    return
+                                }
+                                
+                                print("Downloading data from Facebook image")
+                                
+                                URLSession.shared.dataTask(with: url) { data, _, error in
+                                    guard let data = data, error == nil else
+                                    {
+                                        print("Failed to get data from Facebook: \(error!.localizedDescription)")
+                                        return
+                                    }
+                                    
+                                    print("Got data from Facebook, uploading...")
+                                    
+                                    guard let selectedImage = UIImage(data: data) else 
+                                    {
+                                        print("Failed to convert data to UIImage")
+                                        return
+                                    }
+                                    
+                                    let filename = chatUser.profilePictureFileName
+                                    StorageManager.shared.uploadProfilePicture(with: selectedImage, fileName: filename) { result in
+                                        switch result
+                                        {
+                                        case .success(let downloadUrl):
+                                            UserDefaults.standard.set(downloadUrl, forKey: "profile_picture_url")
+                                            print(downloadUrl)
+                                        case .failure(let error):
+                                            print("Storage manager error: \(error)")
+                                        }
+                                    }
+                                }.resume()
+                            }
+                        }
+                    }
+                }
+                
+                let credential = FacebookAuthProvider.credential(withAccessToken: accessToken!)
+                
+                FirebaseAuth.Auth.auth().signIn(with: credential) { authResult, error in
+                    if let error = error 
+                    {
+                        print("Firebase login failed with error: \(error.localizedDescription)")
+                        return
+                    }
+                    // Successfully logged in with Firebase
+                    strongSelf.navigationController?.dismiss(animated: true, completion: nil)
+                }
+            }
+        }
     }
 }
 
 extension LoginViewController: UITextFieldDelegate
 {
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool 
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool
     {
-        if textField == emailField
-        {
-            passwordField.becomeFirstResponder()
-        }
-        
-        else if textField == passwordField
-        {
-            loginButtonTapped()
-        }
-        
+        if textField == emailField { passwordField.becomeFirstResponder() }
+        else if textField == passwordField { loginButtonTapped() }
         return true
     }
 }
-
