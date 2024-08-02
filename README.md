@@ -2,7 +2,8 @@
 
 ## Features:
 - Facebook Log In
-- Email/ Password Registration / Log In
+- Firebase
+- Email / Password Registration / Log In
 - User Profile
 - Photo Messages
 - Video Messages
